@@ -1,179 +1,239 @@
-import React, { useState, useRef } from 'react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Volleyball Court Formation</title>
+  <meta name="viewport" content="width=400, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+    .court-box {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      background: #fdba74;
+      border: 4px solid #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.09);
+      margin-bottom: 1.5rem;
+      overflow: visible;
+      user-select: none;
+    }
+    /* Court Markings */
+    .court-net { position: absolute; top:0; left:0; right:0; height:8px; background:#fff;}
+    .court-attack { position: absolute; top:64px; left:0; right:0; height:4px; background:rgba(255,255,255,0.8);}
+    .court-side-l { position: absolute; top:0; bottom:0; left:0; width:4px; background:#fff;}
+    .court-side-r { position: absolute; top:0; bottom:0; right:0; width:4px; background:#fff;}
+    .court-end { position: absolute; bottom:0; left:0; right:0; height:4px; background:#fff;}
+    .court-center { position: absolute; top:16px; left:50%; width:64px; height:2px; background:#fff; transform:translateX(-50%); }
+    /* Court Labels */
+    .court-label { position: absolute; font-size: 12px; font-weight: 600; color: #374151;}
+    .label-net { top:6px; left:8px;}
+    .label-end { bottom:6px; right:8px;}
+    .label-attack { top:84px; left:8px;}
+    /* Player Circles */
+    .player {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.13);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: move;
+      transition: transform 0.08s;
+      z-index: 1;
+      user-select: none;
+    }
+    .player.dragging { z-index: 10; transform: scale(1.1);}
+    .player.OH { background: #3b82f6; }
+    .player.MB { background: #22c55e; }
+    .player.S  { background: #a21caf; }
+    .player.OP { background: #f97316; }
+    .player.libero { background: #ef4444; }
+    /* Legend */
+    .legend {
+      margin-top: 2rem;
+      background: #fff;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: max-content;
+    }
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .legend-circle {
+      width: 24px; height: 24px; border-radius: 50%; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: bold; margin-right: 4px;
+    }
+    .legend .OH { background: #3b82f6; }
+    .legend .MB { background: #22c55e; }
+    .legend .S  { background: #a21caf; }
+    .legend .OP { background: #f97316; }
+    .legend .libero { background: #ef4444; }
+    .legend-details { font-size: 12px; color: #555; margin-top: 8px;}
+    .info { margin-top: 1.5rem; color: #666; max-width: 400px; font-size: 14px; text-align: center;}
+    .reset-btn {
+      margin-bottom: 1.2rem;
+      padding: .5rem 1.5rem;
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+    .reset-btn:hover { background: #2563eb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="font-size:2rem; font-weight:700; color:#2d3748; margin-bottom:1.2rem;">Volleyball Court Formation</h1>
+    <button class="reset-btn" onclick="resetPlayers()">Reset Positions</button>
 
-const VolleyballCourtApp = () => {
-  const courtRef = useRef(null);
-  const [draggedPlayer, setDraggedPlayer] = useState(null);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-
-  // Initial player positions (2 OH, 2 MB, 1 S, 1 OP + 1 libero)
-  const [players, setPlayers] = useState([
-    // Front row
-    { id: 1, x: 80, y: 150, type: 'OH', position: 'OH' },
-    { id: 2, x: 200, y: 150, type: 'MB', position: 'MB' },
-    { id: 3, x: 320, y: 150, type: 'OP', position: 'OP' },
-    // Back row
-    { id: 4, x: 80, y: 250, type: 'OH', position: 'OH' },
-    { id: 5, x: 200, y: 250, type: 'S', position: 'S' },
-    { id: 6, x: 320, y: 250, type: 'MB', position: 'MB' },
-    // Libero
-    { id: 7, x: 150, y: 200, type: 'libero', position: 'L' }
-  ]);
-
-  const handleMouseDown = (e, player) => {
-    e.preventDefault();
-    const rect = courtRef.current.getBoundingClientRect();
-    const playerElement = e.target;
-    const playerRect = playerElement.getBoundingClientRect();
-    
-    setDraggedPlayer(player.id);
-    setDragOffset({
-      x: e.clientX - playerRect.left - playerRect.width / 2,
-      y: e.clientY - playerRect.top - playerRect.height / 2
-    });
-  };
-
-  const handleMouseMove = (e) => {
-    if (draggedPlayer === null) return;
-
-    const rect = courtRef.current.getBoundingClientRect();
-    const newX = e.clientX - rect.left - dragOffset.x - 20; // 20 is half the circle diameter
-    const newY = e.clientY - rect.top - dragOffset.y - 20;
-
-    // Allow players to move anywhere within the container area
-    const boundedX = Math.max(-50, Math.min(450, newX));
-    const boundedY = Math.max(-50, Math.min(450, newY));
-
-    setPlayers(prev => prev.map(player => 
-      player.id === draggedPlayer 
-        ? { ...player, x: boundedX, y: boundedY }
-        : player
-    ));
-  };
-
-  const handleMouseUp = () => {
-    setDraggedPlayer(null);
-    setDragOffset({ x: 0, y: 0 });
-  };
-
-  const resetPositions = () => {
-    setPlayers([
-      { id: 1, x: 80, y: 150, type: 'OH', position: 'OH' },
-      { id: 2, x: 200, y: 150, type: 'MB', position: 'MB' },
-      { id: 3, x: 320, y: 150, type: 'OP', position: 'OP' },
-      { id: 4, x: 80, y: 250, type: 'OH', position: 'OH' },
-      { id: 5, x: 200, y: 250, type: 'S', position: 'S' },
-      { id: 6, x: 320, y: 250, type: 'MB', position: 'MB' },
-      { id: 7, x: 150, y: 200, type: 'libero', position: 'L' }
-    ]);
-  };
-
-  return (
-    <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Volleyball Court Formation</h1>
-      
-      <div className="mb-4">
-        <button
-          onClick={resetPositions}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        >
-          Reset Positions
-        </button>
-      </div>
-
-      <div 
-        ref={courtRef}
-        className="relative bg-orange-200 border-4 border-white shadow-lg overflow-visible"
-        style={{ width: '400px', height: '400px' }}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-      >
-        {/* Court markings */}
-        {/* Net line */}
-        <div className="absolute top-0 left-0 right-0 h-2 bg-white"></div>
-        
-        {/* Attack line (10-foot line) */}
-        <div className="absolute top-16 left-0 right-0 h-1 bg-white opacity-80"></div>
-        
-        {/* Side lines */}
-        <div className="absolute top-0 bottom-0 left-0 w-1 bg-white"></div>
-        <div className="absolute top-0 bottom-0 right-0 w-1 bg-white"></div>
-        
-        {/* End line */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-white"></div>
-
-        {/* Center line markings */}
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-16 h-0.5 bg-white"></div>
-
-        {/* Players */}
-        {players.map((player) => (
-          <div
-            key={player.id}
-            className={`absolute w-10 h-10 rounded-full cursor-move select-none flex items-center justify-center text-white font-bold text-xs border-2 border-white shadow-md transition-transform hover:scale-110 ${
-              player.type === 'libero' 
-                ? 'bg-red-500' 
-                : player.type === 'OH'
-                ? 'bg-blue-500'
-                : player.type === 'MB'
-                ? 'bg-green-500'
-                : player.type === 'S'
-                ? 'bg-purple-500'
-                : player.type === 'OP'
-                ? 'bg-orange-500'
-                : 'bg-gray-500'
-            } ${draggedPlayer === player.id ? 'z-10 scale-110' : ''}`}
-            style={{
-              left: `${player.x}px`,
-              top: `${player.y}px`,
-            }}
-            onMouseDown={(e) => handleMouseDown(e, player)}
-          >
-            {player.position}
-          </div>
-        ))}
-
-        {/* Court labels */}
-        <div className="absolute top-2 left-2 text-xs font-semibold text-gray-700">NET</div>
-        <div className="absolute bottom-2 right-2 text-xs font-semibold text-gray-700">END LINE</div>
-        <div className="absolute top-20 left-2 text-xs font-semibold text-gray-700">ATTACK LINE</div>
-      </div>
-
-      {/* Legend */}
-      <div className="mt-6 bg-white p-4 rounded-lg shadow">
-        <h3 className="font-semibold mb-2">Player Positions:</h3>
-        <div className="flex flex-wrap gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">OH</div>
-            <span>Outside Hitter (2)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">MB</div>
-            <span>Middle Blocker (2)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">S</div>
-            <span>Setter (1)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">OP</div>
-            <span>Opposite (1)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">L</div>
-            <span>Libero (1)</span>
-          </div>
-        </div>
-        <div className="mt-2 text-xs text-gray-600">
-          <p>Total: 2 OH + 2 MB + 1 S + 1 OP + 1 L = 7 players</p>
-        </div>
-      </div>
-
-      <div className="mt-4 text-sm text-gray-600 text-center max-w-md">
-        Drag the circles to arrange your team formation. Players can move anywhere on or off the court. 
-        This allows you to position players for serves, substitutions, or timeouts.
-      </div>
+    <div class="court-box" id="court">
+      <!-- Court Lines -->
+      <div class="court-net"></div>
+      <div class="court-attack"></div>
+      <div class="court-side-l"></div>
+      <div class="court-side-r"></div>
+      <div class="court-end"></div>
+      <div class="court-center"></div>
+      <!-- Labels -->
+      <div class="court-label label-net">NET</div>
+      <div class="court-label label-end">END LINE</div>
+      <div class="court-label label-attack">ATTACK LINE</div>
+      <!-- Players are rendered via JS -->
     </div>
-  );
-};
 
-export default VolleyballCourtApp;
+    <div class="legend">
+      <div class="legend-row"><div class="legend-circle OH">OH</div> Outside Hitter (2)</div>
+      <div class="legend-row"><div class="legend-circle MB">MB</div> Middle Blocker (2)</div>
+      <div class="legend-row"><div class="legend-circle S">S</div> Setter (1)</div>
+      <div class="legend-row"><div class="legend-circle OP">OP</div> Opposite (1)</div>
+      <div class="legend-row"><div class="legend-circle libero">L</div> Libero (1)</div>
+      <div class="legend-details">Total: 2 OH + 2 MB + 1 S + 1 OP + 1 L = 7 players</div>
+    </div>
+    <div class="info">
+      Drag the circles to arrange your team formation. Players can move anywhere on or off the court.<br>
+      This allows you to position players for serves, substitutions, or timeouts.
+    </div>
+  </div>
+  <script>
+    // Initial player positions (same as React example)
+    const initialPlayers = [
+      { id: 1, x: 80,  y: 150, type: 'OH',     label: 'OH' },
+      { id: 2, x: 200, y: 150, type: 'MB',     label: 'MB' },
+      { id: 3, x: 320, y: 150, type: 'OP',     label: 'OP' },
+      { id: 4, x: 80,  y: 250, type: 'OH',     label: 'OH' },
+      { id: 5, x: 200, y: 250, type: 'S',      label: 'S'  },
+      { id: 6, x: 320, y: 250, type: 'MB',     label: 'MB' },
+      { id: 7, x: 150, y: 200, type: 'libero', label: 'L'  }
+    ];
+    let players = JSON.parse(JSON.stringify(initialPlayers));
+    let draggedPlayerId = null;
+    let offsetX = 0, offsetY = 0;
+
+    function renderPlayers() {
+      const court = document.getElementById('court');
+      // Remove existing players
+      court.querySelectorAll('.player').forEach(el => el.remove());
+      // Render players
+      players.forEach(player => {
+        const div = document.createElement('div');
+        div.className = `player ${player.type}`;
+        div.style.left = `${player.x}px`;
+        div.style.top = `${player.y}px`;
+        div.textContent = player.label;
+        div.setAttribute('data-id', player.id);
+        div.onmousedown = function(e) {
+          draggedPlayerId = player.id;
+          offsetX = e.offsetX;
+          offsetY = e.offsetY;
+          div.classList.add('dragging');
+          document.body.style.cursor = 'grabbing';
+        };
+        court.appendChild(div);
+      });
+    }
+
+    function onCourtMouseMove(e) {
+      if (draggedPlayerId === null) return;
+      const court = document.getElementById('court');
+      const rect = court.getBoundingClientRect();
+      // Mouse position within court
+      let x = e.clientX - rect.left - offsetX;
+      let y = e.clientY - rect.top - offsetY;
+      // Clamp inside the court (allow slight overflow)
+      x = Math.max(-50, Math.min(450, x));
+      y = Math.max(-50, Math.min(450, y));
+      // Update player
+      players = players.map(p => p.id === draggedPlayerId ? { ...p, x, y } : p);
+      renderPlayers();
+      // preserve dragging status
+      const el = court.querySelector(`.player[data-id='${draggedPlayerId}']`);
+      if (el) el.classList.add('dragging');
+    }
+    function onCourtMouseUp() {
+      draggedPlayerId = null;
+      document.body.style.cursor = '';
+      renderPlayers();
+    }
+    function resetPlayers() {
+      players = JSON.parse(JSON.stringify(initialPlayers));
+      renderPlayers();
+    }
+    // Init
+    renderPlayers();
+    // Event listeners
+    const court = document.getElementById('court');
+    court.addEventListener('mousemove', onCourtMouseMove);
+    court.addEventListener('mouseup', onCourtMouseUp);
+    court.addEventListener('mouseleave', onCourtMouseUp);
+    document.addEventListener('mouseup', onCourtMouseUp);
+    // Touch support
+    court.addEventListener('touchmove', function(e) {
+      if (draggedPlayerId === null) return;
+      const touch = e.touches[0];
+      const rect = court.getBoundingClientRect();
+      let x = touch.clientX - rect.left - 20;
+      let y = touch.clientY - rect.top - 20;
+      x = Math.max(-50, Math.min(450, x));
+      y = Math.max(-50, Math.min(450, y));
+      players = players.map(p => p.id === draggedPlayerId ? { ...p, x, y } : p);
+      renderPlayers();
+      const el = court.querySelector(`.player[data-id='${draggedPlayerId}']`);
+      if (el) el.classList.add('dragging');
+    });
+    court.addEventListener('touchend', onCourtMouseUp);
+    // Touch start for players
+    court.addEventListener('touchstart', function(e) {
+      const target = e.target.closest('.player');
+      if (!target) return;
+      draggedPlayerId = Number(target.getAttribute('data-id'));
+      document.body.style.cursor = 'grabbing';
+    });
+  </script>
+</body>
+</html>
