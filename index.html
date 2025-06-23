@@ -1,0 +1,179 @@
+import React, { useState, useRef } from 'react';
+
+const VolleyballCourtApp = () => {
+  const courtRef = useRef(null);
+  const [draggedPlayer, setDraggedPlayer] = useState(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
+  // Initial player positions (2 OH, 2 MB, 1 S, 1 OP + 1 libero)
+  const [players, setPlayers] = useState([
+    // Front row
+    { id: 1, x: 80, y: 150, type: 'OH', position: 'OH' },
+    { id: 2, x: 200, y: 150, type: 'MB', position: 'MB' },
+    { id: 3, x: 320, y: 150, type: 'OP', position: 'OP' },
+    // Back row
+    { id: 4, x: 80, y: 250, type: 'OH', position: 'OH' },
+    { id: 5, x: 200, y: 250, type: 'S', position: 'S' },
+    { id: 6, x: 320, y: 250, type: 'MB', position: 'MB' },
+    // Libero
+    { id: 7, x: 150, y: 200, type: 'libero', position: 'L' }
+  ]);
+
+  const handleMouseDown = (e, player) => {
+    e.preventDefault();
+    const rect = courtRef.current.getBoundingClientRect();
+    const playerElement = e.target;
+    const playerRect = playerElement.getBoundingClientRect();
+    
+    setDraggedPlayer(player.id);
+    setDragOffset({
+      x: e.clientX - playerRect.left - playerRect.width / 2,
+      y: e.clientY - playerRect.top - playerRect.height / 2
+    });
+  };
+
+  const handleMouseMove = (e) => {
+    if (draggedPlayer === null) return;
+
+    const rect = courtRef.current.getBoundingClientRect();
+    const newX = e.clientX - rect.left - dragOffset.x - 20; // 20 is half the circle diameter
+    const newY = e.clientY - rect.top - dragOffset.y - 20;
+
+    // Allow players to move anywhere within the container area
+    const boundedX = Math.max(-50, Math.min(450, newX));
+    const boundedY = Math.max(-50, Math.min(450, newY));
+
+    setPlayers(prev => prev.map(player => 
+      player.id === draggedPlayer 
+        ? { ...player, x: boundedX, y: boundedY }
+        : player
+    ));
+  };
+
+  const handleMouseUp = () => {
+    setDraggedPlayer(null);
+    setDragOffset({ x: 0, y: 0 });
+  };
+
+  const resetPositions = () => {
+    setPlayers([
+      { id: 1, x: 80, y: 150, type: 'OH', position: 'OH' },
+      { id: 2, x: 200, y: 150, type: 'MB', position: 'MB' },
+      { id: 3, x: 320, y: 150, type: 'OP', position: 'OP' },
+      { id: 4, x: 80, y: 250, type: 'OH', position: 'OH' },
+      { id: 5, x: 200, y: 250, type: 'S', position: 'S' },
+      { id: 6, x: 320, y: 250, type: 'MB', position: 'MB' },
+      { id: 7, x: 150, y: 200, type: 'libero', position: 'L' }
+    ]);
+  };
+
+  return (
+    <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Volleyball Court Formation</h1>
+      
+      <div className="mb-4">
+        <button
+          onClick={resetPositions}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+        >
+          Reset Positions
+        </button>
+      </div>
+
+      <div 
+        ref={courtRef}
+        className="relative bg-orange-200 border-4 border-white shadow-lg overflow-visible"
+        style={{ width: '400px', height: '400px' }}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        {/* Court markings */}
+        {/* Net line */}
+        <div className="absolute top-0 left-0 right-0 h-2 bg-white"></div>
+        
+        {/* Attack line (10-foot line) */}
+        <div className="absolute top-16 left-0 right-0 h-1 bg-white opacity-80"></div>
+        
+        {/* Side lines */}
+        <div className="absolute top-0 bottom-0 left-0 w-1 bg-white"></div>
+        <div className="absolute top-0 bottom-0 right-0 w-1 bg-white"></div>
+        
+        {/* End line */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-white"></div>
+
+        {/* Center line markings */}
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-16 h-0.5 bg-white"></div>
+
+        {/* Players */}
+        {players.map((player) => (
+          <div
+            key={player.id}
+            className={`absolute w-10 h-10 rounded-full cursor-move select-none flex items-center justify-center text-white font-bold text-xs border-2 border-white shadow-md transition-transform hover:scale-110 ${
+              player.type === 'libero' 
+                ? 'bg-red-500' 
+                : player.type === 'OH'
+                ? 'bg-blue-500'
+                : player.type === 'MB'
+                ? 'bg-green-500'
+                : player.type === 'S'
+                ? 'bg-purple-500'
+                : player.type === 'OP'
+                ? 'bg-orange-500'
+                : 'bg-gray-500'
+            } ${draggedPlayer === player.id ? 'z-10 scale-110' : ''}`}
+            style={{
+              left: `${player.x}px`,
+              top: `${player.y}px`,
+            }}
+            onMouseDown={(e) => handleMouseDown(e, player)}
+          >
+            {player.position}
+          </div>
+        ))}
+
+        {/* Court labels */}
+        <div className="absolute top-2 left-2 text-xs font-semibold text-gray-700">NET</div>
+        <div className="absolute bottom-2 right-2 text-xs font-semibold text-gray-700">END LINE</div>
+        <div className="absolute top-20 left-2 text-xs font-semibold text-gray-700">ATTACK LINE</div>
+      </div>
+
+      {/* Legend */}
+      <div className="mt-6 bg-white p-4 rounded-lg shadow">
+        <h3 className="font-semibold mb-2">Player Positions:</h3>
+        <div className="flex flex-wrap gap-4 text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">OH</div>
+            <span>Outside Hitter (2)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">MB</div>
+            <span>Middle Blocker (2)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">S</div>
+            <span>Setter (1)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">OP</div>
+            <span>Opposite (1)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">L</div>
+            <span>Libero (1)</span>
+          </div>
+        </div>
+        <div className="mt-2 text-xs text-gray-600">
+          <p>Total: 2 OH + 2 MB + 1 S + 1 OP + 1 L = 7 players</p>
+        </div>
+      </div>
+
+      <div className="mt-4 text-sm text-gray-600 text-center max-w-md">
+        Drag the circles to arrange your team formation. Players can move anywhere on or off the court. 
+        This allows you to position players for serves, substitutions, or timeouts.
+      </div>
+    </div>
+  );
+};
+
+export default VolleyballCourtApp;
