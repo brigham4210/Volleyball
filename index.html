@@ -232,6 +232,10 @@
       const target = e.target.closest('.player');
       if (!target) return;
       draggedPlayerId = Number(target.getAttribute('data-id'));
+      const touch = e.touches[0];
+      const rect = target.getBoundingClientRect();
+      offsetX = touch.clientX - rect.left;
+      offsetY = touch.clientY - rect.top;
       document.body.style.cursor = 'grabbing';
     });
   </script>
