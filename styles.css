@@ -1,0 +1,100 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    min-height: 100vh;
+}
+.court-box {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    background: #fdba74;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.09);
+    margin-bottom: 1.5rem;
+    overflow: visible;
+    user-select: none;
+}
+/* Court Markings */
+.court-net { position: absolute; top:0; left:0; right:0; height:8px; background:#fff;}
+.court-attack { position: absolute; top:64px; left:0; right:0; height:4px; background:rgba(255,255,255,0.8);}
+.court-side-l { position: absolute; top:0; bottom:0; left:0; width:4px; background:#fff;}
+.court-side-r { position: absolute; top:0; bottom:0; right:0; width:4px; background:#fff;}
+.court-end { position: absolute; bottom:0; left:0; right:0; height:4px; background:#fff;}
+.court-center { position: absolute; top:16px; left:50%; width:64px; height:2px; background:#fff; transform:translateX(-50%); }
+/* Court Labels */
+.court-label { position: absolute; font-size: 12px; font-weight: 600; color: #374151;}
+.label-net { top:6px; left:8px;}
+.label-end { bottom:6px; right:8px;}
+.label-attack { top:84px; left:8px;}
+/* Player Circles */
+.player {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #fff;
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.13);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: move;
+    transition: transform 0.08s;
+    z-index: 1;
+    user-select: none;
+}
+.player.dragging { z-index: 10; transform: scale(1.1);}
+.player.OH { background: #3b82f6; }
+.player.MB { background: #22c55e; }
+.player.S  { background: #a21caf; }
+.player.OP { background: #f97316; }
+.player.libero { background: #ef4444; }
+/* Legend */
+.legend {
+    margin-top: 2rem;
+    background: #fff;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: max-content;
+}
+.legend-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+.legend-circle {
+    width: 24px; height: 24px; border-radius: 50%; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: bold; margin-right: 4px;
+}
+.legend .OH { background: #3b82f6; }
+.legend .MB { background: #22c55e; }
+.legend .S  { background: #a21caf; }
+.legend .OP { background: #f97316; }
+.legend .libero { background: #ef4444; }
+.legend-details { font-size: 12px; color: #555; margin-top: 8px;}
+.info { margin-top: 1.5rem; color: #666; max-width: 400px; font-size: 14px; text-align: center;}
+.reset-btn {
+    margin-bottom: 1.2rem;
+    padding: .5rem 1.5rem;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.18s;
+}
+.reset-btn:hover { background: #2563eb; }
