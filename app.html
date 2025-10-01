@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volleyball Formation</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>Volleyball Formation Manager</h1>
+      <div class="toolbar">
+        <button id="resetBtn" class="btn btn-primary">Reset Positions</button>
+        <button id="editLabelsBtn" class="btn btn-secondary">Edit Labels</button>
+        <button id="saveBtn" class="btn btn-success">Save Formation</button>
+        <button id="loadBtn" class="btn btn-info">Load Formation</button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="court-container">
+        <div class="court" id="court">
+          <!-- Court markings -->
+          <div class="court-net"></div>
+          <div class="court-attack-line"></div>
+          <div class="court-center-line"></div>
+          <div class="court-sideline court-sideline-left"></div>
+          <div class="court-sideline court-sideline-right"></div>
+          <div class="court-baseline"></div>
+          
+          <!-- Court labels -->
+          <div class="court-label net-label">NET</div>
+          <div class="court-label attack-label">ATTACK LINE</div>
+          <div class="court-label baseline-label">BASELINE</div>
+          
+          <!-- Players will be dynamically added here -->
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="position-legend">
+          <h3>Player Positions</h3>
+          <div class="legend-item">
+            <div class="player-circle o1">O1</div>
+            <span class="legend-text">Outside Hitter 1</span>
+          </div>
+          <div class="legend-item">
+            <div class="player-circle o2">O2</div>
+            <span class="legend-text">Outside Hitter 2</span>
+          </div>
+          <div class="legend-item">
+            <div class="player-circle m1">M1</div>
+            <span class="legend-text">Middle Blocker 1</span>
+          </div>
+          <div class="legend-item">
+            <div class="player-circle m2">M2</div>
+            <span class="legend-text">Middle Blocker 2</span>
+          </div>
+          <div class="legend-item">
+            <div class="player-circle s">S</div>
+            <span class="legend-text">Setter</span>
+          </div>
+          <div class="legend-item">
+            <div class="player-circle op">OP</div>
+            <span class="legend-text">Opposite</span>
+          </div>
+          <div class="legend-item">
+            <div class="player-circle l">L</div>
+            <span class="legend-text">Libero</span>
+          </div>
+        </div>
+
+        <div class="formation-info">
+          <h3>Formation Details</h3>
+          <p>Total Players: 7</p>
+          <p>Drag players to arrange formation</p>
+          <p>Double-click to edit labels</p>
+        </div>
+
+        <div class="saved-formations">
+          <h3>Quick Formations</h3>
+          <button class="formation-preset" data-formation="6-2">6-2 Formation</button>
+          <button class="formation-preset" data-formation="5-1">5-1 Formation</button>
+          <button class="formation-preset" data-formation="4-2">4-2 Formation</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal for editing labels -->
+  <div id="labelModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Player Labels</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="label-editor">
+          <div class="label-input-group">
+            <label>Outside Hitter 1:</label>
+            <input type="text" id="label-o1" maxlength="4">
+          </div>
+          <div class="label-input-group">
+            <label>Outside Hitter 2:</label>
+            <input type="text" id="label-o2" maxlength="4">
+          </div>
+          <div class="label-input-group">
+            <label>Middle Blocker 1:</label>
+            <input type="text" id="label-m1" maxlength="4">
+          </div>
+          <div class="label-input-group">
+            <label>Middle Blocker 2:</label>
+            <input type="text" id="label-m2" maxlength="4">
+          </div>
+          <div class="label-input-group">
+            <label>Setter:</label>
+            <input type="text" id="label-s" maxlength="4">
+          </div>
+          <div class="label-input-group">
+            <label>Opposite:</label>
+            <input type="text" id="label-op" maxlength="4">
+          </div>
+          <div class="label-input-group">
+            <label>Libero:</label>
+            <input type="text" id="label-l" maxlength="4">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="saveLabelBtn" class="btn btn-primary">Save Changes</button>
+        <button id="cancelLabelBtn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Modal -->
+  <div id="aboutModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>About Volleyball Formation</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Volleyball Formation Manager v1.0</strong></p>
+        <p>A native app for creating and managing volleyball team formations.</p>
+        <p>Features:</p>
+        <ul>
+          <li>7 player positions with customizable labels</li>
+          <li>Drag and drop formation editing</li>
+          <li>Save and load formations</li>
+          <li>Quick formation presets</li>
+        </ul>
+        <p>Default positions: O1, O2, M1, M2, S, OP, L</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary modal-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
