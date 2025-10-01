@@ -1,0 +1,45 @@
+{
+  "name": "volleyball-formation-app",
+  "version": "1.0.0",
+  "description": "A native volleyball formation app with 7 positions",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build-mac": "electron-builder --mac",
+    "build-win": "electron-builder --win",
+    "build-linux": "electron-builder --linux",
+    "dist": "electron-builder --publish=never"
+  },
+  "keywords": ["volleyball", "formation", "native", "electron"],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.volleyball.formation",
+    "productName": "Volleyball Formation",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "app.html",
+      "app.css",
+      "app.js",
+      "preload.js"
+    ],
+    "mac": {
+      "category": "public.app-category.sports",
+      "icon": "assets/icon.icns"
+    },
+    "win": {
+      "icon": "assets/icon.ico"
+    },
+    "linux": {
+      "icon": "assets/icon.png"
+    }
+  }
+}
