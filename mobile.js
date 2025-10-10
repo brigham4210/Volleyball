@@ -191,10 +191,11 @@ class MobileVolleyballApp {
   }
 
   resetRotation() {
-    // Reset to initial positions
+    // Reset to starting rotation (Rotation 1)
     this.players = JSON.parse(JSON.stringify(this.initialPlayers));
     this.currentRotation = 1;
     this.renderPlayers();
+    this.updateRotationInfo();
     this.showToast('Reset to starting rotation');
   }
 
@@ -310,9 +311,18 @@ class MobileVolleyballApp {
 
   // Formation functions
   resetPositions() {
-    this.players = JSON.parse(JSON.stringify(this.initialPlayers));
-    this.currentRotation = 1;
-    this.currentServer = 6; // Reset to opposite as server
+    // Reset positions for current rotation only (if players were dragged)
+    this.players.forEach(player => {
+      if (player.rotationPosition > 0) { // Skip libero
+        const correctPos = this.rotationPositions[player.rotationPosition];
+        player.x = correctPos.x;
+        player.y = correctPos.y;
+      } else {
+        // Reset libero to off-court position
+        player.x = 15;
+        player.y = 90;
+      }
+    });
     this.renderPlayers();
     
     // Haptic feedback
@@ -320,7 +330,7 @@ class MobileVolleyballApp {
       navigator.vibrate(100);
     }
     
-    this.showToast('Positions reset');
+    this.showToast('Positions reset to current rotation');
   }
 
   openLabelModal() {

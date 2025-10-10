@@ -163,10 +163,9 @@ class VolleyballFormationApp {
   }
 
   resetRotation() {
-    // Reset to initial positions with setter as server
+    // Reset to starting rotation (Rotation 1)
     this.players = JSON.parse(JSON.stringify(this.initialPlayers));
     this.currentRotation = 1;
-    this.currentServer = 5; // Setter
     this.renderPlayers();
   }
 
@@ -244,8 +243,18 @@ class VolleyballFormationApp {
   }
 
   resetPositions() {
-    this.players = JSON.parse(JSON.stringify(this.initialPlayers));
-    this.currentRotation = 1;
+    // Reset positions for current rotation only (if players were dragged)
+    this.players.forEach(player => {
+      if (player.rotationPosition > 0) { // Skip libero
+        const correctPos = this.rotationPositions[player.rotationPosition];
+        player.x = correctPos.x;
+        player.y = correctPos.y;
+      } else {
+        // Reset libero to off-court position
+        player.x = 100;
+        player.y = 350;
+      }
+    });
     this.renderPlayers();
   }
 
