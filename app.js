@@ -1,4 +1,8 @@
-// Volleyball Formation App - Native App Logic
+// Volleyball Formation App - Native App     document.getElementById('resetBtn').addEventListener('click', () => this.resetPositions());
+    document.getElementById('saveBtn').addEventListener('click', () => this.showSaveModal());
+    document.getElementById('loadBtn').addEventListener('click', () => this.showLoadModal());
+    document.getElementById('nextRotationBtn').addEventListener('click', () => this.nextRotation());
+    document.getElementById('resetRotationBtn').addEventListener('click', () => this.resetRotation());
 
 class VolleyballFormationApp {
   constructor() {
