@@ -3,18 +3,29 @@
 class VolleyballFormationApp {
   constructor() {
     this.players = [
-      { id: 1, position: 'o1', label: 'O1', x: 100, y: 120, name: 'Outside Hitter 1' },
-      { id: 2, position: 'o2', label: 'O2', x: 400, y: 120, name: 'Outside Hitter 2' },
-      { id: 3, position: 'm1', label: 'M1', x: 200, y: 120, name: 'Middle Blocker 1' },
-      { id: 4, position: 'm2', label: 'M2', x: 300, y: 120, name: 'Middle Blocker 2' },
-      { id: 5, position: 's', label: 'S', x: 150, y: 220, name: 'Setter' },
-      { id: 6, position: 'op', label: 'OP', x: 350, y: 220, name: 'Opposite' },
-      { id: 7, position: 'l', label: 'L', x: 250, y: 280, name: 'Libero' }
+      { id: 1, position: 'o1', label: 'O1', x: 100, y: 220, name: 'Outside Hitter 1', rotationPosition: 1 },
+      { id: 2, position: 'o2', label: 'O2', x: 400, y: 120, name: 'Outside Hitter 2', rotationPosition: 6 },
+      { id: 3, position: 'm1', label: 'M1', x: 250, y: 220, name: 'Middle Blocker 1', rotationPosition: 2 },
+      { id: 4, position: 'm2', label: 'M2', x: 250, y: 120, name: 'Middle Blocker 2', rotationPosition: 5 },
+      { id: 5, position: 's', label: 'S', x: 400, y: 220, name: 'Setter', rotationPosition: 3 },
+      { id: 6, position: 'op', label: 'OP', x: 100, y: 120, name: 'Opposite', rotationPosition: 4 },
+      { id: 7, position: 'l', label: 'L', x: 100, y: 350, name: 'Libero', rotationPosition: 0 }
     ];
     
     this.initialPlayers = JSON.parse(JSON.stringify(this.players));
+    this.currentRotation = 1;
     this.draggedPlayer = null;
     this.dragOffset = { x: 0, y: 0 };
+    
+    // Standard volleyball rotation positions (clockwise from position 1)
+    this.rotationPositions = {
+      1: { x: 100, y: 220 }, // Back left (position 1) - O1
+      2: { x: 250, y: 220 }, // Back middle (position 2) - M1
+      3: { x: 400, y: 220 }, // Back right (position 3) - S
+      4: { x: 100, y: 120 }, // Front left (position 4) - OP
+      5: { x: 250, y: 120 }, // Front middle (position 5) - M2
+      6: { x: 400, y: 120 }  // Front right (position 6) - O2
+    };
     
     this.init();
   }
@@ -31,6 +42,8 @@ class VolleyballFormationApp {
     document.getElementById('editLabelsBtn').addEventListener('click', () => this.openLabelModal());
     document.getElementById('saveBtn').addEventListener('click', () => this.saveFormation());
     document.getElementById('loadBtn').addEventListener('click', () => this.loadFormation());
+    document.getElementById('nextRotationBtn').addEventListener('click', () => this.nextRotation());
+    document.getElementById('resetRotationBtn').addEventListener('click', () => this.resetRotation());
 
     // Modal event listeners
     document.getElementById('saveLabelBtn').addEventListener('click', () => this.saveLabels());
@@ -43,12 +56,12 @@ class VolleyballFormationApp {
       });
     });
 
-    // Formation preset buttons
-    document.querySelectorAll('.formation-preset').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        this.loadPresetFormation(e.target.dataset.formation);
-      });
-    });
+    // Formation preset buttons - REMOVED
+    // document.querySelectorAll('.formation-preset').forEach(btn => {
+    //   btn.addEventListener('click', (e) => {
+    //     this.loadPresetFormation(e.target.dataset.formation);
+    //   });
+    // });
 
     // Court drag and drop
     const court = document.getElementById('court');
@@ -94,6 +107,7 @@ class VolleyballFormationApp {
     this.players.forEach(player => {
       const playerEl = document.createElement('div');
       playerEl.className = `player ${player.position}`;
+      
       playerEl.style.left = `${player.x}px`;
       playerEl.style.top = `${player.y}px`;
       playerEl.textContent = player.label;
@@ -107,6 +121,49 @@ class VolleyballFormationApp {
       
       court.appendChild(playerEl);
     });
+    
+    // Update rotation info
+    this.updateRotationInfo();
+  }
+
+  updateRotationInfo() {
+    document.getElementById('rotationCount').textContent = this.currentRotation;
+  }
+
+  nextRotation() {
+    // Rotate all players according to your specific pattern (except libero)
+    this.players.forEach(player => {
+      if (player.rotationPosition > 0) { // Skip libero (position 0)
+        // Custom rotation mapping: 1→4, 2→1, 3→2, 4→5, 5→6, 6→3
+        switch(player.rotationPosition) {
+          case 1: player.rotationPosition = 4; break; // Back left → Front left
+          case 2: player.rotationPosition = 1; break; // Back middle → Back left
+          case 3: player.rotationPosition = 2; break; // Back right → Back middle
+          case 4: player.rotationPosition = 5; break; // Front left → Front middle
+          case 5: player.rotationPosition = 6; break; // Front middle → Front right
+          case 6: player.rotationPosition = 3; break; // Front right → Back right
+        }
+        
+        // Update position on court based on rotation
+        const newPos = this.rotationPositions[player.rotationPosition];
+        player.x = newPos.x;
+        player.y = newPos.y;
+      }
+      // Libero stays at original position (x: 100, y: 350) - off court
+    });
+    
+    // Update rotation count
+    this.currentRotation = this.currentRotation === 6 ? 1 : this.currentRotation + 1;
+    
+    this.renderPlayers();
+  }
+
+  resetRotation() {
+    // Reset to initial positions with setter as server
+    this.players = JSON.parse(JSON.stringify(this.initialPlayers));
+    this.currentRotation = 1;
+    this.currentServer = 5; // Setter
+    this.renderPlayers();
   }
 
   handleMouseDown(e) {
@@ -184,20 +241,22 @@ class VolleyballFormationApp {
 
   resetPositions() {
     this.players = JSON.parse(JSON.stringify(this.initialPlayers));
+    this.currentRotation = 1;
     this.renderPlayers();
   }
 
   resetFormation() {
     // Reset both positions and labels
     this.players = [
-      { id: 1, position: 'o1', label: 'O1', x: 100, y: 120, name: 'Outside Hitter 1' },
-      { id: 2, position: 'o2', label: 'O2', x: 400, y: 120, name: 'Outside Hitter 2' },
-      { id: 3, position: 'm1', label: 'M1', x: 200, y: 120, name: 'Middle Blocker 1' },
-      { id: 4, position: 'm2', label: 'M2', x: 300, y: 120, name: 'Middle Blocker 2' },
-      { id: 5, position: 's', label: 'S', x: 150, y: 220, name: 'Setter' },
-      { id: 6, position: 'op', label: 'OP', x: 350, y: 220, name: 'Opposite' },
-      { id: 7, position: 'l', label: 'L', x: 250, y: 280, name: 'Libero' }
+      { id: 1, position: 'o1', label: 'O1', x: 400, y: 120, name: 'Outside Hitter 1', rotationPosition: 3 },
+      { id: 2, position: 'o2', label: 'O2', x: 100, y: 220, name: 'Outside Hitter 2', rotationPosition: 4 },
+      { id: 3, position: 'm1', label: 'M1', x: 250, y: 120, name: 'Middle Blocker 1', rotationPosition: 2 },
+      { id: 4, position: 'm2', label: 'M2', x: 250, y: 220, name: 'Middle Blocker 2', rotationPosition: 5 },
+      { id: 5, position: 's', label: 'S', x: 400, y: 220, name: 'Setter', rotationPosition: 6 },
+      { id: 6, position: 'op', label: 'OP', x: 100, y: 120, name: 'Opposite', rotationPosition: 1 },
+      { id: 7, position: 'l', label: 'L', x: 100, y: 350, name: 'Libero', rotationPosition: 0 }
     ];
+    this.currentRotation = 1;
     this.renderPlayers();
   }
 
@@ -243,6 +302,7 @@ class VolleyballFormationApp {
   saveFormation() {
     const formationData = {
       players: this.players,
+      currentRotation: this.currentRotation,
       timestamp: new Date().toISOString(),
       name: prompt('Enter formation name:', 'My Formation') || 'Unnamed Formation'
     };
@@ -273,7 +333,9 @@ class VolleyballFormationApp {
       
       const index = parseInt(selection) - 1;
       if (index >= 0 && index < formations.length) {
-        this.players = JSON.parse(JSON.stringify(formations[index].players));
+        const formation = formations[index];
+        this.players = JSON.parse(JSON.stringify(formation.players));
+        this.currentRotation = formation.currentRotation || 1;
         this.renderPlayers();
         alert('Formation loaded successfully!');
       } else {
@@ -285,44 +347,8 @@ class VolleyballFormationApp {
     }
   }
 
-  loadPresetFormation(formationType) {
-    switch (formationType) {
-      case '6-2':
-        this.players = [
-          { id: 1, position: 'o1', label: 'O1', x: 80, y: 100, name: 'Outside Hitter 1' },
-          { id: 2, position: 'o2', label: 'O2', x: 420, y: 100, name: 'Outside Hitter 2' },
-          { id: 3, position: 'm1', label: 'M1', x: 200, y: 100, name: 'Middle Blocker 1' },
-          { id: 4, position: 'm2', label: 'M2', x: 300, y: 100, name: 'Middle Blocker 2' },
-          { id: 5, position: 's', label: 'S', x: 120, y: 200, name: 'Setter' },
-          { id: 6, position: 'op', label: 'OP', x: 380, y: 200, name: 'Opposite' },
-          { id: 7, position: 'l', label: 'L', x: 250, y: 300, name: 'Libero' }
-        ];
-        break;
-      case '5-1':
-        this.players = [
-          { id: 1, position: 'o1', label: 'O1', x: 80, y: 120, name: 'Outside Hitter 1' },
-          { id: 2, position: 'o2', label: 'O2', x: 420, y: 220, name: 'Outside Hitter 2' },
-          { id: 3, position: 'm1', label: 'M1', x: 200, y: 120, name: 'Middle Blocker 1' },
-          { id: 4, position: 'm2', label: 'M2', x: 300, y: 220, name: 'Middle Blocker 2' },
-          { id: 5, position: 's', label: 'S', x: 180, y: 220, name: 'Setter' },
-          { id: 6, position: 'op', label: 'OP', x: 320, y: 120, name: 'Opposite' },
-          { id: 7, position: 'l', label: 'L', x: 250, y: 280, name: 'Libero' }
-        ];
-        break;
-      case '4-2':
-        this.players = [
-          { id: 1, position: 'o1', label: 'O1', x: 100, y: 120, name: 'Outside Hitter 1' },
-          { id: 2, position: 'o2', label: 'O2', x: 400, y: 120, name: 'Outside Hitter 2' },
-          { id: 3, position: 'm1', label: 'M1', x: 200, y: 120, name: 'Middle Blocker 1' },
-          { id: 4, position: 'm2', label: 'M2', x: 300, y: 120, name: 'Middle Blocker 2' },
-          { id: 5, position: 's', label: 'S', x: 150, y: 220, name: 'Setter' },
-          { id: 6, position: 'op', label: 'OP', x: 350, y: 220, name: 'Opposite' },
-          { id: 7, position: 'l', label: 'L', x: 250, y: 280, name: 'Libero' }
-        ];
-        break;
-    }
-    this.renderPlayers();
-  }
+  // Remove preset formation methods since we removed quick formations
+  // loadPresetFormation() method removed
 
   showAbout() {
     document.getElementById('aboutModal').style.display = 'block';

@@ -297,28 +297,66 @@ body {
   margin-bottom: 0.5rem;
 }
 
-/* Saved Formations */
-.saved-formations {
+/* Rotation Control */
+.rotation-control {
   margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(243, 244, 246, 0.5);
+  border-radius: 8px;
+  border: 2px solid #3b82f6;
 }
 
-.formation-preset {
+.rotation-info {
+  margin-bottom: 1rem;
+}
+
+.rotation-info p {
+  color: #374151;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.rotation-info span {
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.next-rotation-btn {
   display: block;
   width: 100%;
   margin-bottom: 0.5rem;
   padding: 0.75rem;
-  background: #f3f4f6;
+  background: #10b981;
   border: none;
   border-radius: 6px;
-  color: #374151;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.next-rotation-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.reset-rotation-btn {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  background: #6b7280;
+  border: none;
+  border-radius: 6px;
+  color: white;
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.formation-preset:hover {
-  background: #e5e7eb;
-  transform: translateY(-1px);
+.reset-rotation-btn:hover {
+  background: #4b5563;
 }
 
 /* Modal Styles */

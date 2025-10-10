@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Volleyball Formation</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#667eea">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Volleyball">
+  <link rel="apple-touch-icon" href="icons/icon-152x152.png">
+  <link rel="stylesheet" href="mobile.css">
+</head>
+<body>
+  <div class="mobile-app">
+    <header class="mobile-header">
+      <h1>🏐 Volleyball Formation</h1>
+      <div class="header-buttons">
+        <button id="menuBtn" class="icon-btn">☰</button>
+        <button id="resetBtn" class="icon-btn">↻</button>
+      </div>
+    </header>
+
+    <!-- Rotation info bar -->
+    <div class="rotation-bar">
+      <span id="rotationInfo">Rotation: 1/6</span>
+    </div>
+
+    <main class="mobile-main">
+      <div class="court-wrapper">
+        <div class="mobile-court" id="court">
+          <!-- Court markings -->
+          <div class="court-net"></div>
+          <div class="court-attack-line"></div>
+          <div class="court-center-line"></div>
+          <div class="court-sideline court-sideline-left"></div>
+          <div class="court-sideline court-sideline-right"></div>
+          <div class="court-baseline"></div>
+          
+          <!-- Court labels -->
+          <div class="court-label net-label">NET</div>
+          <div class="court-label attack-label">ATTACK</div>
+          <div class="court-label baseline-label">BASELINE</div>
+          
+          <!-- Players will be dynamically added here -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom toolbar -->
+    <div class="mobile-toolbar">
+      <button id="nextRotationBtn" class="toolbar-btn primary">
+        <span class="btn-icon">➡️</span>
+        <span class="btn-text">NEXT</span>
+      </button>
+      <button id="editLabelsBtn" class="toolbar-btn">
+        <span class="btn-icon">✏️</span>
+        <span class="btn-text">Edit</span>
+      </button>
+      <button id="saveBtn" class="toolbar-btn">
+        <span class="btn-icon">💾</span>
+        <span class="btn-text">Save</span>
+      </button>
+      <button id="loadBtn" class="toolbar-btn">
+        <span class="btn-icon">📁</span>
+        <span class="btn-text">Load</span>
+      </button>
+    </div>
+
+    <!-- Side menu -->
+    <div id="sideMenu" class="side-menu">
+      <div class="menu-header">
+        <h3>Player Positions</h3>
+        <button id="closeMeuBtn" class="close-btn">×</button>
+      </div>
+      <div class="menu-content">
+        <div class="legend-item">
+          <div class="player-circle o1">O1</div>
+          <span>Outside Hitter 1</span>
+        </div>
+        <div class="legend-item">
+          <div class="player-circle o2">O2</div>
+          <span>Outside Hitter 2</span>
+        </div>
+        <div class="legend-item">
+          <div class="player-circle m1">M1</div>
+          <span>Middle Blocker 1</span>
+        </div>
+        <div class="legend-item">
+          <div class="player-circle m2">M2</div>
+          <span>Middle Blocker 2</span>
+        </div>
+        <div class="legend-item">
+          <div class="player-circle s">S</div>
+          <span>Setter</span>
+        </div>
+        <div class="legend-item">
+          <div class="player-circle op">OP</div>
+          <span>Opposite</span>
+        </div>
+        <div class="legend-item">
+          <div class="player-circle l">L</div>
+          <span>Libero</span>
+        </div>
+        
+        <div class="menu-section">
+          <h4>Rotation System</h4>
+          <p>• Use NEXT button to rotate clockwise</p>
+          <p>• Libero stays off court (doesn't rotate)</p>
+        </div>
+
+        <div class="rotation-controls">
+          <button id="resetRotationBtn" class="reset-rotation-btn">Reset to Start Position</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal overlays -->
+    <div id="labelModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Edit Player Labels</h3>
+          <button class="modal-close">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="label-inputs">
+            <div class="input-group">
+              <label>O1:</label>
+              <input type="text" id="label-o1" maxlength="4">
+            </div>
+            <div class="input-group">
+              <label>O2:</label>
+              <input type="text" id="label-o2" maxlength="4">
+            </div>
+            <div class="input-group">
+              <label>M1:</label>
+              <input type="text" id="label-m1" maxlength="4">
+            </div>
+            <div class="input-group">
+              <label>M2:</label>
+              <input type="text" id="label-m2" maxlength="4">
+            </div>
+            <div class="input-group">
+              <label>S:</label>
+              <input type="text" id="label-s" maxlength="4">
+            </div>
+            <div class="input-group">
+              <label>OP:</label>
+              <input type="text" id="label-op" maxlength="4">
+            </div>
+            <div class="input-group">
+              <label>L:</label>
+              <input type="text" id="label-l" maxlength="4">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="saveLabelBtn" class="btn-primary">Save</button>
+          <button id="cancelLabelBtn" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Install prompt -->
+    <div id="installPrompt" class="install-prompt" style="display: none;">
+      <div class="install-content">
+        <span>📱 Install this app on your home screen for the best experience!</span>
+        <button id="installBtn" class="install-btn">Install</button>
+        <button id="dismissBtn" class="dismiss-btn">×</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="mobile.js"></script>
+</body>
+</html>

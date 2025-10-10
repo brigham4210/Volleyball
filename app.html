@@ -76,13 +76,16 @@
           <p>Total Players: 7</p>
           <p>Drag players to arrange formation</p>
           <p>Double-click to edit labels</p>
+          <p><strong>Note:</strong> Libero stays off-court</p>
         </div>
 
-        <div class="saved-formations">
-          <h3>Quick Formations</h3>
-          <button class="formation-preset" data-formation="6-2">6-2 Formation</button>
-          <button class="formation-preset" data-formation="5-1">5-1 Formation</button>
-          <button class="formation-preset" data-formation="4-2">4-2 Formation</button>
+        <div class="rotation-control">
+          <h3>Rotation Control</h3>
+          <div class="rotation-info">
+            <p><strong>Rotation:</strong> <span id="rotationCount">1</span>/6</p>
+          </div>
+          <button id="nextRotationBtn" class="next-rotation-btn">NEXT ROTATION</button>
+          <button id="resetRotationBtn" class="reset-rotation-btn">RESET TO START</button>
         </div>
       </div>
     </main>
