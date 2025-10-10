@@ -40,7 +40,7 @@ class MobileVolleyballApp {
   setupEventListeners() {
     // Header buttons
     document.getElementById('menuBtn').addEventListener('click', () => this.toggleMenu());
-    document.getElementById('resetBtn').addEventListener('click', () => this.resetPositions());
+    document.getElementById('resetBtn').addEventListener('click', () => this.resetRotation());
 
     // Toolbar buttons
     document.getElementById('nextRotationBtn').addEventListener('click', () => this.nextRotation());
@@ -50,7 +50,7 @@ class MobileVolleyballApp {
 
     // Menu
     document.getElementById('closeMeuBtn').addEventListener('click', () => this.closeMenu());
-    document.getElementById('resetRotationBtn').addEventListener('click', () => this.resetRotation());
+    document.getElementById('resetRotationBtn').addEventListener('click', () => this.resetPositions());
 
     // Modal events
     document.getElementById('saveLabelBtn').addEventListener('click', () => this.saveLabels());

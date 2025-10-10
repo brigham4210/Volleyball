@@ -1,8 +1,8 @@
-// Volleyball Formation App - Native App     document.getElementById('resetBtn').addEventListener('click', () => this.resetPositions());
+// Volleyball Formation App - Native App     document.getElementById('resetBtn').addEventListener('click', () => this.resetRotation());
     document.getElementById('saveBtn').addEventListener('click', () => this.showSaveModal());
     document.getElementById('loadBtn').addEventListener('click', () => this.showLoadModal());
     document.getElementById('nextRotationBtn').addEventListener('click', () => this.nextRotation());
-    document.getElementById('resetRotationBtn').addEventListener('click', () => this.resetRotation());
+    document.getElementById('resetRotationBtn').addEventListener('click', () => this.resetPositions());
 
 class VolleyballFormationApp {
   constructor() {
@@ -42,12 +42,12 @@ class VolleyballFormationApp {
 
   setupEventListeners() {
     // Button event listeners
-    document.getElementById('resetBtn').addEventListener('click', () => this.resetPositions());
+    document.getElementById('resetBtn').addEventListener('click', () => this.resetRotation());
     document.getElementById('editLabelsBtn').addEventListener('click', () => this.openLabelModal());
     document.getElementById('saveBtn').addEventListener('click', () => this.saveFormation());
     document.getElementById('loadBtn').addEventListener('click', () => this.loadFormation());
     document.getElementById('nextRotationBtn').addEventListener('click', () => this.nextRotation());
-    document.getElementById('resetRotationBtn').addEventListener('click', () => this.resetRotation());
+    document.getElementById('resetRotationBtn').addEventListener('click', () => this.resetPositions());
 
     // Modal event listeners
     document.getElementById('saveLabelBtn').addEventListener('click', () => this.saveLabels());
